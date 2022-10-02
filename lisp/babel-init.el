@@ -13,31 +13,67 @@
       backup-directory-alist
       `(("." . ,(concat user-emacs-directory "backups"))))
 
+(defun efs/display-startup-time ()
+  (message
+   "Emacs loaded in %s with %d garbage collections."
+   (format
+    "%.2f seconds"
+    (float-time
+     (time-subtract after-init-time before-init-time)))
+   gcs-done))
+
+(add-hook 'emacs-startup-hook #'efs/display-startup-time)
+
+(set-face-attribute 'default nil
+		    :font "Hack"
+		    :weight 'light
+		    :height 120)
+
+(set-face-attribute 'tab-bar-tab nil :inherit
+ 'doom-modeline-panel :foreground nil :background nil)
+
 (use-package doom-themes
   :ensure t
   :config
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
 	doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-dark+ t)
-
+  (load-theme 'doom-horizon t)
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
   ;; Enable custom neotree theme (all-the-icons must be installed!)
   (doom-themes-neotree-config)
   ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+  (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
+
+(defun disable-all-themes ()
+  "disable all active themes."
+  (dolist (i custom-enabled-themes)
+    (disable-theme i)))
+
+(defadvice load-theme (before disable-themes-first activate)
+  (disable-all-themes))
+
 ;; scroll one line at a time (less "jumpy" than defaults)
+
+(use-package gcmh
+  :ensure t)
 (pixel-scroll-precision-mode)
-(setq pixel-scroll-precision-large-scroll-height 40.0)
-(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
+
+;(setq pixel-scroll-precision-interpolate-mice 0)
+;(setq pixel-scroll-precision-interpolation-factor 1.25)
+;(setq pixel-scroll-precision-initial-velocity-factor 0)
+;(setq pixel-scroll-precision-momentum-min-velocity 0)
+
+;(setq pixel-scroll-precision-large-scroll-height 40.0)
+;(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
 (setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
-(setq scroll-step           1
-	scroll-conservatively 10000)
+;(setq scroll-step           1
+	;scroll-conservatively 10000)
 
 ;(set-face-attribute 'region nil :background "deep sky blue")
 (set-face-attribute 'default nil :height 120)
@@ -50,6 +86,19 @@
 (use-package all-the-icons
   :ensure t
   :if (display-graphic-p))
+
+;;(use-package centaur-tabs
+;;  :ensure t
+;;  :demand
+;;  :config
+;;  (centaur-tabs-mode t)
+;;  :bind
+;;  ("C-<prior>" . centaur-tabs-backward)
+;;  ("C-<next>" . centaur-tabs-forward))
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
 
 (setq evil-want-keybinding nil)
   (use-package evil-collection
@@ -169,6 +218,22 @@
 
 (font-lock-add-keywords 'rustic-mode
 		   '(("\\<\\([a-zA-Z_]*\\) *("  1 font-lock-function-name-face)))
+
+(use-package tree-sitter
+  :ensure t)
+
+(use-package tree-sitter-langs
+  :ensure t
+  :config
+    (set-face-attribute 'tree-sitter-hl-face:function.call nil
+			:inherit 'font-lock-function-name-face
+			:foreground nil
+			:background nil)
+    (set-face-attribute 'tree-sitter-hl-face:property nil
+			:inherit nil
+			:foreground nil
+			:background nil)
+  )
 
 (use-package lsp-mode
 :ensure t
