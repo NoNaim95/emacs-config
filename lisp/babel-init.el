@@ -21,11 +21,13 @@
 (setq scroll-step           1
 	scroll-conservatively 10000)
 
-(set-face-attribute 'region nil :background "deep sky blue")
+;(set-face-attribute 'region nil :background "deep sky blue")
 (set-face-attribute 'default nil :height 120)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
+(global-display-line-numbers-mode)
+(setq display-line-numbers-type 'relative)
 
 (use-package evil :ensure t :config (evil-mode)
   (evil-set-undo-system 'undo-redo))
@@ -52,6 +54,20 @@
     (define-key evil-insert-state-map (kbd "C-k") nil)
     (evil-define-key nil vertico-map (kbd "C-j") #'vertico-next)
     (evil-define-key nil vertico-map (kbd "C-k") #'vertico-previous)))
+
+(use-package vterm
+  :ensure t
+  :config
+  (add-hook 'vterm-mode-hook (lambda () (
+					message "Hallo ?"
+					)))
+  (add-hook 'vterm-mode-hook (lambda () (
+					evil-local-mode -1
+					)))
+  (add-hook 'vterm-mode-hook (lambda () (
+					setq cursor-type 'bar
+					)))
+  )
 
 (use-package which-key
 :ensure t
@@ -92,14 +108,6 @@
 (use-package perspective
 :ensure t)
 
-(use-package projectile
-:ensure t)
-
-(use-package treemacs-projectile
-:ensure t)
-
-(use-package treemacs
-:ensure t)
 
 (use-package winum
 :ensure t
@@ -119,6 +127,23 @@
 (winum-mode)
 )
 
+(use-package projectile
+    :ensure t
+    :bind-keymap ("C-c p" . projectile-command-map)
+    :config
+    (setq projectile-project-search-path '(("~/programming/" . 2) ("~/gitpacks" . 1) ("~/design_patterns_rust/" . 2)))
+    (projectile-mode)
+)
+
+    (use-package treemacs-projectile
+    :ensure t)
+
+    (use-package treemacs
+    :ensure t)
+
+(font-lock-add-keywords 'rustic-mode
+		   '(("\\<\\([a-zA-Z_]*\\) *("  1 font-lock-function-name-face)))
+
 (use-package lsp-mode
 :ensure t
 :bind (:map lsp-mode-map
@@ -128,17 +153,18 @@
 :config
 (lsp-enable-which-key-integration t))
 
+(use-package lsp-ui
+     :ensure t)
+
 (use-package company
 :ensure t
 :hook ((emacs-lisp-mode . (lambda ()
 			    (setq-local company-backends '(company-elisp))))
 	(emacs-lisp-mode . company-mode))
 :bind(
-	(:map company-active-map ("<tab>" . company-complete-selection))
+	(:map company-active-map ("<tab>" . company-complete-selection)
 	("C-j" . company-select-next-or-abort)
-	("C-k" . company-select-previous-or-abort)
-
-	)
+	("C-k" . company-select-previous-or-abort)))
 :config
 ;(company-keymap--unbind-quick-access company-active-map)
 ;(company-tng-configure-default)
@@ -152,8 +178,10 @@
 (use-package rustic
 :ensure t
 :bind(
+(:map rust-mode-map
 	("<f6>" . rustic-format-buffer)
 	("<f5>" . my-cargo-run)
+)
 	)
 :config
 (require 'lsp-rust)
@@ -197,7 +225,11 @@
  '((emacs-lisp . t)
    (python . t)))
 
+(define-key org-mode-map (kbd "C-c C-i") 'org-edit-src-code)
+
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
 (add-to-list 'org-structure-template-alist '("sh" . "src sh"))
 (add-to-list 'org-structure-template-alist '("rs" . "src rust"))
+
+(add-hook 'projectile-after-switch-project-hook 'treemacs-add-and-display-current-project-exclusively)
