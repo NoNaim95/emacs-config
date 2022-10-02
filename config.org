@@ -1,5 +1,5 @@
 #+title My Emacs config in Org mode!
-#+PROPERTY: header-args:emacs-lisp :tangle (concat user-emacs-directory "lisp/babel-init-el")
+#+PROPERTY: header-args:emacs-lisp :tangle (concat user-emacs-directory "lisp/babel-init.el")
 
 * Setup
 #+begin_src emacs-lisp
