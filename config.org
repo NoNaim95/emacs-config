@@ -1,5 +1,5 @@
 #+title My Emacs config in Org mode!
-#+PROPERTY: header-args:emacs-lisp :tangle ~/.my_programming_emacs/lisp/babel-init.el
+#+PROPERTY: header-args:emacs-lisp :tangle (concat user-emacs-directory "lisp/babel-init-el")
 
 * Setup
 #+begin_src emacs-lisp
@@ -10,13 +10,13 @@
     (package-install 'use-package))
     (require 'use-package)
 
-    (setq custom-file "~/.my_programming_emacs/custom.el")
+    (setq custom-file (concat user-emacs-directory "custom.el"))
     (load custom-file t)
 
     (setq auto-save-file-name-transforms
-	'(("." "~/.my_programming_emacs/" t))
+	`(("." ,user-emacs-directory t))
 	backup-directory-alist
-	'(("." . "~/.my_programming_emacs/backups")))
+	`(("." . ,(concat user-emacs-directory "backups"))))
 #+end_src
 
 * Basic UI Config
@@ -259,7 +259,7 @@
 #+begin_src emacs-lisp
 (defun org-babel-tangle-config()
   (when (string-equal (buffer-file-name)
-		      (expand-file-name "~/.my_programming_emacs/config.org"))
+		      (expand-file-name(concat user-emacs-directory "config.org")))
     ;; Dynamic scoping to the rescue
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
