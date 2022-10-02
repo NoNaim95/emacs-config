@@ -5,13 +5,31 @@
   (package-install 'use-package))
   (require 'use-package)
 
-  (setq custom-file "~/.my_programming_emacs/custom.el")
+  (setq custom-file (concat user-emacs-directory "custom.el"))
   (load custom-file t)
 
   (setq auto-save-file-name-transforms
-      '(("." "~/.my_programming_emacs/" t))
+      `(("." ,user-emacs-directory t))
       backup-directory-alist
-      '(("." . "~/.my_programming_emacs/backups")))
+      `(("." . ,(concat user-emacs-directory "backups"))))
+
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+	doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-dark+ t)
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  ;; Enable custom neotree theme (all-the-icons must be installed!)
+  (doom-themes-neotree-config)
+  ;; or for treemacs users
+  (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
 
 ;; scroll one line at a time (less "jumpy" than defaults)
 (pixel-scroll-precision-mode)
@@ -29,17 +47,25 @@
 (global-display-line-numbers-mode)
 (setq display-line-numbers-type 'relative)
 
-(use-package evil :ensure t :config (evil-mode)
-  (evil-set-undo-system 'undo-redo))
+(use-package all-the-icons
+  :ensure t
+  :if (display-graphic-p))
 
-  (use-package evil-org
-      :ensure t
-:hook org-mode)
+(setq evil-want-keybinding nil)
+  (use-package evil-collection
+    :ensure t)
 
-   (require
-	'evil-magit)
+  (evil-collection-init)
 
-  (use-package treemacs-evil :ensure t)
+    (use-package evil :ensure t :config (evil-mode)
+    (evil-set-undo-system 'undo-redo))
+
+    (use-package evil-org
+	:ensure t
+  :hook org-mode)
+
+
+    (use-package treemacs-evil :ensure t)
 
 (with-eval-after-load 'evil
 (with-eval-after-load 'company
@@ -212,7 +238,7 @@
 
 (defun org-babel-tangle-config()
   (when (string-equal (buffer-file-name)
-		      (expand-file-name "~/.my_programming_emacs/config.org"))
+		      (expand-file-name(concat user-emacs-directory "config.org")))
     ;; Dynamic scoping to the rescue
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))

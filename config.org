@@ -63,25 +63,31 @@
   (setq display-line-numbers-type 'relative)
 #+end_src
 
+** Icons
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :ensure t
+    :if (display-graphic-p))
+#+end_src
 * Evil Stuff
 ** Installs
 #+begin_src emacs-lisp
-  (use-package evil-collection
-    :ensure t)
-    (setq evil-want-keybinding nil)
+  (setq evil-want-keybinding nil)
+    (use-package evil-collection
+      :ensure t)
+
     (evil-collection-init)
 
-    (use-package evil :ensure t :config (evil-mode)
-    (evil-set-undo-system 'undo-redo))
+      (use-package evil :ensure t :config (evil-mode)
+      (evil-set-undo-system 'undo-redo))
 
-    (use-package evil-org
-	:ensure t
-  :hook org-mode)
+      (use-package evil-org
+	  :ensure t
+    :hook org-mode)
 
 
-    (use-package treemacs-evil :ensure t)
+      (use-package treemacs-evil :ensure t)
 #+end_src
-
 ** Tweaks
 #+begin_src emacs-lisp
     (with-eval-after-load 'evil
