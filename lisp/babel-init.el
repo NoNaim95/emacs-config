@@ -61,11 +61,20 @@
 ;; scroll one line at a time (less "jumpy" than defaults)
 
 (use-package gcmh
-  :ensure t)
+  :demand
+  :hook
+  (focus-out-hook . gcmh-idle-garbage-collect)
+
+  :custom
+  (gcmh-idle-delay 10)
+  (gcmh-high-cons-threshold 104857600)
+
+  :config
+  (gcmh-mode +1))
 (pixel-scroll-precision-mode)
 
 ;(setq pixel-scroll-precision-interpolate-mice 0)
-;(setq pixel-scroll-precision-interpolation-factor 1.25)
+;(setq pixel-scroll-precision-interpolation-factor 1.7)
 ;(setq pixel-scroll-precision-initial-velocity-factor 0)
 ;(setq pixel-scroll-precision-momentum-min-velocity 0)
 
