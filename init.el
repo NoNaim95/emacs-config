@@ -1,5 +1,5 @@
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
-(load (concat user-  emacs-directory "lisp/babel-init.el"))
+(load (concat user-emacs-directory "lisp/babel-init.el"))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
