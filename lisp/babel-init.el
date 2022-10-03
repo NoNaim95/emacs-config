@@ -58,6 +58,7 @@
 ;; scroll one line at a time (less "jumpy" than defaults)
 
 (use-package gcmh
+  :ensure t
   :demand
   :hook
   (focus-out-hook . gcmh-idle-garbage-collect)
