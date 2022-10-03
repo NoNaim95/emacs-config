@@ -257,15 +257,19 @@
 
 ** Projects
 #+begin_src emacs-lisp
-
       (use-package projectile
       :ensure t
-      :bind-keymap ("C-c p" . projectile-command-map)
+      :bind-keymap
+      ("C-c p" . projectile-command-map)
       :config
       (setq projectile-project-search-path '(("~/programming/" . 2) ("~/gitpacks" . 1) ("~/design_patterns_rust/" . 2)))
+      ;(define-key projectile-mode-map (kbd "SPC p") 'projectile-command-map)
       (projectile-mode)
   )
-  
+
+  ;(define-key evil-normal-state-map " " nil)
+  (define-key evil-motion-state-map " " nil)
+
       (use-package treemacs-projectile
       :ensure t)
 
