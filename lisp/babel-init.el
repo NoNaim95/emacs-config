@@ -25,12 +25,9 @@
 (add-hook 'emacs-startup-hook #'efs/display-startup-time)
 
 (set-face-attribute 'default nil
-		    :font "Hack"
+		    :font "Jetbrains Mono"
 		    :weight 'light
 		    :height 120)
-
-(set-face-attribute 'tab-bar-tab nil :inherit
- 'doom-modeline-panel :foreground nil :background nil)
 
 (use-package doom-themes
   :ensure t
@@ -81,11 +78,9 @@
 ;(setq pixel-scroll-precision-large-scroll-height 40.0)
 ;(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
 (setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
-;(setq scroll-step           1
-	;scroll-conservatively 10000)
+(setq scroll-step           1
+	scroll-conservatively 10000)
 
-;(set-face-attribute 'region nil :background "deep sky blue")
-(set-face-attribute 'default nil :height 120)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
@@ -107,7 +102,13 @@
 
 (use-package doom-modeline
   :ensure t
-  :init (doom-modeline-mode 1))
+  :init
+  (doom-modeline-mode 1)
+  :config
+  (set-face-attribute 'tab-bar-tab nil
+		    :inherit 'doom-modeline-panel
+		    :foreground nil
+		    :background nil))
 
 (setq evil-want-keybinding nil)
   (use-package evil-collection
