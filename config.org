@@ -287,8 +287,8 @@
 		     '(("\\<\\([a-zA-Z_]*\\) *("  1 font-lock-function-name-face)))
 
   (use-package tree-sitter
-    :hook
     :ensure t
+    :hook
     (
      (rustic-mode . tree-sitter-mode)
      (rustic-mode . tree-sitter-hl-mode)
