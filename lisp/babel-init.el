@@ -30,30 +30,33 @@
 		    :height 120)
 
 (use-package doom-themes
-  :ensure t
-  :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-	doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-horizon t)
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
-  ;; Enable custom neotree theme (all-the-icons must be installed!)
-  (doom-themes-neotree-config)
-  ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
-  (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+      :ensure t
+      :config
+      ;; Global settings (defaults)
+      (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+	    doom-themes-enable-italic t) ; if nil, italics is universally disabled
+      (load-theme 'doom-horizon t)
+      ;; Enable flashing mode-line on errors
+      (doom-themes-visual-bell-config)
+      ;; Enable custom neotree theme (all-the-icons must be installed!)
+      (doom-themes-neotree-config)
+      ;; or for treemacs users
+      (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
+      (doom-themes-treemacs-config)
+      ;; Corrects (and improves) org-mode's native fontification.
+      (doom-themes-org-config))
 
 
-(defun disable-all-themes ()
-  "disable all active themes."
-  (dolist (i custom-enabled-themes)
-    (disable-theme i)))
+(use-package badwolf-theme
+  :ensure t)
 
-(defadvice load-theme (before disable-themes-first activate)
-  (disable-all-themes))
+    (defun disable-all-themes ()
+      "disable all active themes."
+      (dolist (i custom-enabled-themes)
+	(disable-theme i)))
+
+    (defadvice load-theme (before disable-themes-first activate)
+      (disable-all-themes))
 
 ;; scroll one line at a time (less "jumpy" than defaults)
 
@@ -236,7 +239,12 @@
 		   '(("\\<\\([a-zA-Z_]*\\) *("  1 font-lock-function-name-face)))
 
 (use-package tree-sitter
-  :ensure t)
+  :hook
+  :ensure t
+  (
+   (rustic-mode . tree-sitter-mode)
+   (rustic-mode . tree-sitter-hl-mode)
+  ))
 
 (use-package tree-sitter-langs
   :ensure t
