@@ -342,6 +342,22 @@
     :ensure t)
 #+end_src
 
+** Debugging DAP
+#+begin_src emacs-lisp
+  (use-package dap-mode
+    :ensure t)
+
+  (dap-register-debug-template "Rust::GDB Run Configuration"
+			       (list :type "gdb"
+				     :request "launch"
+				     :name "GDB::Run"
+				     :gdbpath "rust-gdb"
+				     :target "${workspaceFolder}/target/debug/examples/logger"
+				     :cwd "${workspaceFolder}"))
+
+  (require 'dap-gdb-lldb)
+  (require 'dap-cpptools)
+#+end_src
 ** Rust
 *** Install
 #+begin_src emacs-lisp

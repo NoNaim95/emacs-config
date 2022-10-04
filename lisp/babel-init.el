@@ -290,6 +290,20 @@
 (use-package flycheck
 :ensure t)
 
+(use-package dap-mode
+  :ensure t)
+
+(dap-register-debug-template "Rust::GDB Run Configuration"
+			     (list :type "gdb"
+				   :request "launch"
+				   :name "GDB::Run"
+				   :gdbpath "rust-gdb"
+				   :target "${workspaceFolder}/target/debug/examples/logger"
+				   :cwd "${workspaceFolder}"))
+
+(require 'dap-gdb-lldb)
+(require 'dap-cpptools)
+
 (use-package rustic
 :ensure t
 :bind(
