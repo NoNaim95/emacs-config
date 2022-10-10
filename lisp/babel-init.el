@@ -13,6 +13,19 @@
       backup-directory-alist
       `(("." . ,(concat user-emacs-directory "backups"))))
 
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 6))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+	(url-retrieve-synchronously
+	 "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+	 'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
 (defun efs/display-startup-time ()
   (message
    "Emacs loaded in %s with %d garbage collections."
@@ -26,7 +39,7 @@
 
 (set-face-attribute 'default nil
 		    :font "Jetbrains Mono"
-		    :weight 'light
+		    ;:weight 'light
 		    :height 120)
 
 (use-package doom-themes
@@ -41,7 +54,7 @@
       ;; Enable custom neotree theme (all-the-icons must be installed!)
       (doom-themes-neotree-config)
       ;; or for treemacs users
-      (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
+      ;(setq doom-themes-treemacs-theme "Idea") ; use "doom-colors" for less minimal icon theme
       (doom-themes-treemacs-config)
       ;; Corrects (and improves) org-mode's native fontification.
       (doom-themes-org-config))
@@ -148,9 +161,6 @@
   :ensure t
   :config
   (add-hook 'vterm-mode-hook (lambda () (
-					message "Hallo ?"
-					)))
-  (add-hook 'vterm-mode-hook (lambda () (
 					evil-local-mode -1
 					)))
   (add-hook 'vterm-mode-hook (lambda () (
@@ -217,23 +227,27 @@
 )
 
 (use-package projectile
-    :ensure t
-    :bind-keymap
-    ("C-c p" . projectile-command-map)
-    :config
-    (setq projectile-project-search-path '(("~/programming/" . 2) ("~/gitpacks" . 1) ("~/design_patterns_rust/" . 2)))
-    ;(define-key projectile-mode-map (kbd "SPC p") 'projectile-command-map)
-    (projectile-mode)
-)
+      :ensure t
+      :bind-keymap
+      ("C-c p" . projectile-command-map)
+      :config
+      (setq projectile-project-search-path '(("~/programming/" . 2) ("~/gitpacks" . 1) ("~/design_patterns_rust/" . 2)))
+      ;(define-key projectile-mode-map (kbd "SPC p") 'projectile-command-map)
+      (projectile-mode)
+  )
 
-;(define-key evil-normal-state-map " " nil)
-(define-key evil-motion-state-map " " nil)
+  ;(define-key evil-normal-state-map " " nil)
+  (define-key evil-motion-state-map " " nil)
 
-    (use-package treemacs-projectile
-    :ensure t)
+      (use-package treemacs-projectile
+      :ensure t)
 
-    (use-package treemacs
-    :ensure t)
+
+
+(use-package treemacs
+  :ensure t)
+(use-package lsp-treemacs
+  :ensure t)
 
 (font-lock-add-keywords 'rustic-mode
 		   '(("\\<\\([a-zA-Z_]*\\) *("  1 font-lock-function-name-face)))
@@ -259,6 +273,12 @@
 			:background nil)
   )
 
+(use-package yasnippet
+  :ensure t
+  :config
+  (yas-global-mode))
+(use-package yasnippet-snippets
+  :ensure t)
 (use-package lsp-mode
 :ensure t
 :bind (:map lsp-mode-map
@@ -290,19 +310,38 @@
 (use-package flycheck
 :ensure t)
 
+(setq dap-cpptools-extension-version "1.12.1")
 (use-package dap-mode
   :ensure t)
+
+(require 'dap-gdb-lldb)
+(require 'dap-lldb)
+(require 'dap-cpptools)
 
 (dap-register-debug-template "Rust::GDB Run Configuration"
 			     (list :type "gdb"
 				   :request "launch"
 				   :name "GDB::Run"
 				   :gdbpath "rust-gdb"
-				   :target "${workspaceFolder}/target/debug/examples/logger"
-				   :cwd "${workspaceFolder}"))
-
-(require 'dap-gdb-lldb)
-(require 'dap-cpptools)
+				   :target nil
+				   :cwd nil))
+				   ;;:target "${workspaceFolder}/target/debug/examples/logger"
+				   ;;:cwd "${workspaceFolder}"))
+(with-eval-after-load 'dap-cpptools
+;; Add a template specific for debugging Rust programs.
+;; It is used for new projects, where I can M-x dap-edit-debug-template
+(dap-register-debug-template "Rust::CppTools Run Configuration"
+				(list :type "cppdbg"
+				    :request "launch"
+				    :name "Rust::Run"
+				    :MIMode "gdb"
+				    :miDebuggerPath "rust-gdb"
+				    :environment []
+				    :program "${workspaceFolder}/target/debug/hello / replace with binary"
+				    :cwd "${workspaceFolder}"
+				    :console "external"
+				    :dap-compilation "cargo build"
+				    :dap-compilation-dir "${workspaceFolder}")))
 
 (use-package rustic
 :ensure t
@@ -360,5 +399,20 @@
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
 (add-to-list 'org-structure-template-alist '("sh" . "src sh"))
 (add-to-list 'org-structure-template-alist '("rs" . "src rust"))
+
+(use-package org-modern
+  :ensure t
+  :config
+  (global-org-modern-mode))
+
+(use-package org-roam
+  :ensure t
+  :custom
+  (org-roam-directory "~/RoamNotes")
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+	 ("C-c n f" . org-roam-node-find)
+	 ("C-c n i" . org-roam-node-insert))
+  :config
+  (org-roam-setup))
 
 (add-hook 'projectile-after-switch-project-hook 'treemacs-add-and-display-current-project-exclusively)

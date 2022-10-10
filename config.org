@@ -17,6 +17,19 @@
 	`(("." ,user-emacs-directory t))
 	backup-directory-alist
 	`(("." . ,(concat user-emacs-directory "backups"))))
+
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+	 (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+	(bootstrap-version 6))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+	  (url-retrieve-synchronously
+	   "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+	   'silent 'inhibit-cookies)
+	(goto-char (point-max))
+	(eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
 #+end_src
 
 ** Measure Startup
@@ -38,7 +51,7 @@
 #+begin_src emacs-lisp
   (set-face-attribute 'default nil
 		      :font "Jetbrains Mono"
-		      :weight 'light
+		      ;:weight 'light
 		      :height 120)
 
 #+end_src
@@ -57,7 +70,7 @@
 	;; Enable custom neotree theme (all-the-icons must be installed!)
 	(doom-themes-neotree-config)
 	;; or for treemacs users
-	(setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
+	;(setq doom-themes-treemacs-theme "Idea") ; use "doom-colors" for less minimal icon theme
 	(doom-themes-treemacs-config)
 	;; Corrects (and improves) org-mode's native fontification.
 	(doom-themes-org-config))
@@ -189,9 +202,6 @@
     :ensure t
     :config
     (add-hook 'vterm-mode-hook (lambda () (
-					  message "Hallo ?"
-					  )))
-    (add-hook 'vterm-mode-hook (lambda () (
 					  evil-local-mode -1
 					  )))
     (add-hook 'vterm-mode-hook (lambda () (
@@ -260,24 +270,28 @@
 
 ** Projects
 #+begin_src emacs-lisp
-      (use-package projectile
-      :ensure t
-      :bind-keymap
-      ("C-c p" . projectile-command-map)
-      :config
-      (setq projectile-project-search-path '(("~/programming/" . 2) ("~/gitpacks" . 1) ("~/design_patterns_rust/" . 2)))
-      ;(define-key projectile-mode-map (kbd "SPC p") 'projectile-command-map)
-      (projectile-mode)
-  )
+	(use-package projectile
+	:ensure t
+	:bind-keymap
+	("C-c p" . projectile-command-map)
+	:config
+	(setq projectile-project-search-path '(("~/programming/" . 2) ("~/gitpacks" . 1) ("~/design_patterns_rust/" . 2)))
+	;(define-key projectile-mode-map (kbd "SPC p") 'projectile-command-map)
+	(projectile-mode)
+    )
 
-  ;(define-key evil-normal-state-map " " nil)
-  (define-key evil-motion-state-map " " nil)
+    ;(define-key evil-normal-state-map " " nil)
+    (define-key evil-motion-state-map " " nil)
 
-      (use-package treemacs-projectile
-      :ensure t)
+	(use-package treemacs-projectile
+	:ensure t)
 
-      (use-package treemacs
-      :ensure t)
+
+
+  (use-package treemacs
+    :ensure t)
+  (use-package lsp-treemacs
+    :ensure t)
 #+end_src
 
 * Programming
@@ -310,53 +324,79 @@
 
 ** LSP and Flycheck
 #+begin_src emacs-lisp
-    (use-package lsp-mode
+  (use-package yasnippet
     :ensure t
-    :bind (:map lsp-mode-map
-		("C-c d" . lsp-describe-thing-at-point)
-		("C-c a" . lsp-execute-code-action))
-    :bind-keymap ("C-c l" . lsp-command-map)
     :config
-    (lsp-enable-which-key-integration t))
-
-    (use-package lsp-ui
-         :ensure t)
-
-    (use-package company
-    :ensure t
-    :hook ((emacs-lisp-mode . (lambda ()
-				(setq-local company-backends '(company-elisp))))
-	    (emacs-lisp-mode . company-mode))
-    :bind(
-	    (:map company-active-map ("<tab>" . company-complete-selection)
-	    ("C-j" . company-select-next-or-abort)
-	    ("C-k" . company-select-previous-or-abort)))
-    :config
-    ;(company-keymap--unbind-quick-access company-active-map)
-    ;(company-tng-configure-default)
-    (setq company-idle-delay 0.1
-	    company-minimum-prefix-length 1))
-
-
-    (use-package flycheck
+    (yas-global-mode))
+  (use-package yasnippet-snippets
     :ensure t)
+  (use-package lsp-mode
+  :ensure t
+  :bind (:map lsp-mode-map
+	      ("C-c d" . lsp-describe-thing-at-point)
+	      ("C-c a" . lsp-execute-code-action))
+  :bind-keymap ("C-c l" . lsp-command-map)
+  :config
+  (lsp-enable-which-key-integration t))
+
+  (use-package lsp-ui
+       :ensure t)
+
+  (use-package company
+  :ensure t
+  :hook ((emacs-lisp-mode . (lambda ()
+			      (setq-local company-backends '(company-elisp))))
+	  (emacs-lisp-mode . company-mode))
+  :bind(
+	  (:map company-active-map ("<tab>" . company-complete-selection)
+	  ("C-j" . company-select-next-or-abort)
+	  ("C-k" . company-select-previous-or-abort)))
+  :config
+  ;(company-keymap--unbind-quick-access company-active-map)
+  ;(company-tng-configure-default)
+  (setq company-idle-delay 0.1
+	  company-minimum-prefix-length 1))
+
+
+  (use-package flycheck
+  :ensure t)
 #+end_src
 
 ** Debugging DAP
 #+begin_src emacs-lisp
+  (setq dap-cpptools-extension-version "1.12.1")
   (use-package dap-mode
     :ensure t)
+
+  (require 'dap-gdb-lldb)
+  (require 'dap-lldb)
+  (require 'dap-cpptools)
 
   (dap-register-debug-template "Rust::GDB Run Configuration"
 			       (list :type "gdb"
 				     :request "launch"
 				     :name "GDB::Run"
 				     :gdbpath "rust-gdb"
-				     :target "${workspaceFolder}/target/debug/examples/logger"
-				     :cwd "${workspaceFolder}"))
+				     :target nil
+				     :cwd nil))
+				     ;;:target "${workspaceFolder}/target/debug/examples/logger"
+				     ;;:cwd "${workspaceFolder}"))
+  (with-eval-after-load 'dap-cpptools
+  ;; Add a template specific for debugging Rust programs.
+  ;; It is used for new projects, where I can M-x dap-edit-debug-template
+  (dap-register-debug-template "Rust::CppTools Run Configuration"
+				  (list :type "cppdbg"
+				      :request "launch"
+				      :name "Rust::Run"
+				      :MIMode "gdb"
+				      :miDebuggerPath "rust-gdb"
+				      :environment []
+				      :program "${workspaceFolder}/target/debug/hello / replace with binary"
+				      :cwd "${workspaceFolder}"
+				      :console "external"
+				      :dap-compilation "cargo build"
+				      :dap-compilation-dir "${workspaceFolder}")))
 
-  (require 'dap-gdb-lldb)
-  (require 'dap-cpptools)
 #+end_src
 ** Rust
 *** Install
@@ -433,6 +473,27 @@
   (add-to-list 'org-structure-template-alist '("py" . "src python"))
   (add-to-list 'org-structure-template-alist '("sh" . "src sh"))
   (add-to-list 'org-structure-template-alist '("rs" . "src rust"))
+#+end_src
+
+** Org-modern
+#+begin_src emacs-lisp
+  (use-package org-modern
+    :ensure t
+    :config
+    (global-org-modern-mode))
+#+end_src
+
+* Org-roam
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :ensure t
+    :custom
+    (org-roam-directory "~/RoamNotes")
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+	   ("C-c n f" . org-roam-node-find)
+	   ("C-c n i" . org-roam-node-insert))
+    :config
+    (org-roam-setup))
 #+end_src
 
 * Project Logic
