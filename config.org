@@ -1,6 +1,7 @@
 #+title My Emacs config in Org mode!
 #+PROPERTY: header-args:emacs-lisp :tangle (concat user-emacs-directory "lisp/babel-init.el")
 
+* TestCommit
 * Setup
 #+begin_src emacs-lisp
     (require 'package)
@@ -281,7 +282,7 @@
   	:bind-keymap
   	("C-c p" . projectile-command-map)
   	:config
-  	(setq projectile-project-search-path '(("~/programming/" . 2) ("~/gitpacks" . 1) ("~/design_patterns_rust/" . 2)))
+  	(setq projectile-project-search-path '(("~/programming/" . 2) ("~/gitpacks" . 2) ("~/design_patterns_rust/" . 2)))
   	;(define-key projectile-mode-map (kbd "SPC p") 'projectile-command-map)
   	(projectile-mode))
     
@@ -404,6 +405,7 @@
         				      :dap-compilation-dir "${workspaceFolder}")))
 
 #+end_src
+
 ** Rust
 *** Install
 #+begin_src emacs-lisp
@@ -439,12 +441,27 @@
     
 #+end_src
 
+** Python
+#+begin_src emacs-lisp 
+  (use-package python-mode
+    :ensure t
+    :hook (python-mode . lsp-deferred)
+    :custom
+    (python-shell-interpreter "python3")
+    (dap-python-executable "python3")
+    (dap-python-debugger 'debugpy)
+    :config
+    (require 'dap-python))
+
+#+end_src
+
 ** Aggressive indent mode
 #+begin_src emacs-lisp
   (use-package aggressive-indent
     :ensure t
     :hook prog-mode)
 #+end_src
+
 ** Parinfer
 #+begin_src emacs-lisp
 (use-package parinfer-rust-mode
@@ -452,11 +469,13 @@
   :hook emacs-lisp-mode)
  
 #+end_src
+
 * Requests
 #+begin_src emacs-lisp
   (use-package request
     :ensure t)
 #+end_src
+
 * Elisp
 ** Utils
 *** no-confirm
@@ -477,10 +496,12 @@
       (shell-command (concat "cargo new " path))
       (find-file (concat path "src/main.rs"))))
 #+end_src
+
 *** scrot into org-roam
 #+begin_src emacs-lisp
   (load "scrot")
 #+end_src
+
 * Org mode
 ** Auto-tangle Config
 #+begin_src emacs-lisp
@@ -534,6 +555,7 @@
  	(setq-default fill-column 120))
   
 #+end_src
+
 * Org-roam
 #+begin_src emacs-lisp
 (use-package org-roam
